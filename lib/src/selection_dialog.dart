@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'country_code.dart';
@@ -58,116 +60,134 @@ class SelectionDialog extends StatefulWidget {
 class _SelectionDialogState extends State<SelectionDialog> {
   /// this is useful for filtering purpose
   late List<CountryCode> filteredElements;
+  String characterToShow = '';
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(0.0),
-        child: Container(
-          clipBehavior: Clip.hardEdge,
-          width: widget.size?.width ?? MediaQuery.of(context).size.width,
-          height:
-              widget.size?.height ?? MediaQuery.of(context).size.height * 0.85,
-          decoration: widget.boxDecoration ??
-              BoxDecoration(
-                color: widget.backgroundColor ?? Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: widget.barrierColor ?? Colors.grey.withOpacity(1),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              IconButton(
-                padding: const EdgeInsets.all(0),
-                iconSize: 20,
-                icon: widget.closeIcon!,
-                onPressed: () => Navigator.pop(context),
-              ),
-              if (!widget.hideSearch)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: TextField(
-                    style: widget.searchStyle,
-                    decoration: widget.searchDecoration,
-                    onChanged: _filterElements,
+  Widget build(BuildContext context) => SizedBox(
+        width: widget.size?.width ?? MediaQuery.of(context).size.width,
+        height: widget.size?.height ?? MediaQuery.of(context).size.height * .8,
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(width: 45),
+                Container(
+                  transform: Matrix4.translationValues(0, 10, 0),
+                  child: const Text(
+                    'Select your country code',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF434343),
+                      fontSize: 18,
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w500,
+                      height: 0.07,
+                      letterSpacing: 0.90,
+                    ),
                   ),
                 ),
-              Expanded(
-                child: ListView(
-                  children: [
-                    widget.favoriteElements.isEmpty
-                        ? const DecoratedBox(decoration: BoxDecoration())
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ...widget.favoriteElements.map(
-                                (f) => SimpleDialogOption(
-                                  child: _buildOption(f),
-                                  onPressed: () {
-                                    _selectItem(f);
-                                  },
-                                ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: const RotatedBox(
+                    quarterTurns: 3,
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      size: 17,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 33),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredElements.length,
+                itemBuilder: (context, index) {
+                  final e = filteredElements[index];
+                  bool shouldShowCharacter = _shouldShowCharacterFun(index);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (shouldShowCharacter) _displayLetter(characterToShow),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 40),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                                horizontal: 24.0,
                               ),
-                              const Divider(),
-                            ],
-                          ),
-                    if (filteredElements.isEmpty)
-                      _buildEmptySearchWidget(context)
-                    else
-                      ...filteredElements.map(
-                        (e) => SimpleDialogOption(
-                          child: _buildOption(e),
-                          onPressed: () {
-                            _selectItem(e);
-                          },
+                              child: GestureDetector(
+                                child: _buildOption(e),
+                                onTap: () => _selectItem(e),
+                              ),
+                            ),
+                            const Divider(
+                              endIndent: 40,
+                              indent: 25,
+                            ),
+                          ],
                         ),
-                      ),
-                  ],
-                ),
+                      )
+                    ],
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
+
+  bool _shouldShowCharacterFun(int index) {
+    String firstCharacter = _getFirstCharacter(filteredElements[index].name!);
+    if (firstCharacter != characterToShow) {
+      characterToShow = firstCharacter;
+      return true;
+    }
+    return false;
+  }
+
+  String _getFirstCharacter(String name) {
+    return name
+        .replaceAll(RegExp(r'[[\]]'), '')
+        .split(',')
+        .first[0]
+        .toUpperCase();
+  }
+
+  Widget _displayLetter(String letter) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 13, top: 13, left: 27),
+      child: Text(
+        letter,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xFF979797),
+          fontSize: 16,
+          fontFamily: 'Nunito',
+          fontWeight: FontWeight.w600,
+          height: 0.08,
+        ),
+      ),
+    );
+  }
 
   Widget _buildOption(CountryCode e) {
     return SizedBox(
       width: 400,
-      child: Flex(
-        direction: Axis.horizontal,
-        children: <Widget>[
-          if (widget.showFlag!)
-            Flexible(
-              child: Container(
-                margin: const EdgeInsets.only(right: 16.0),
-                decoration: widget.flagDecoration,
-                clipBehavior:
-                    widget.flagDecoration == null ? Clip.none : Clip.hardEdge,
-                child: Image.asset(
-                  e.flagUri!,
-                  package: 'country_code_picker',
-                  width: widget.flagWidth,
-                ),
-              ),
-            ),
-          Expanded(
-            flex: 4,
-            child: Text(
-              widget.showCountryOnly!
-                  ? e.toCountryStringOnly()
-                  : e.toLongString(),
-              overflow: TextOverflow.fade,
-              style: widget.textStyle,
-            ),
-          ),
-        ],
+      child: Text(
+        widget.showCountryOnly! ? e.toCountryStringOnly() : e.toLongString(),
+        style: const TextStyle(
+          color: Color(0xFF434343),
+          fontSize: 18,
+          fontFamily: 'Nunito',
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }
