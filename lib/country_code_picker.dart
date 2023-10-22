@@ -1,6 +1,7 @@
 library country_code_picker;
 
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:country_code_picker/src/color_extension.dart';
 import 'package:flutter/material.dart';
 
 import 'src/country_code.dart';
@@ -85,6 +86,8 @@ class CountryCodePicker extends StatefulWidget {
   /// with customized codes.
   final List<Map<String, String>> countryList;
 
+  final bool hasError;
+
   const CountryCodePicker({
     this.onChanged,
     this.onInit,
@@ -120,6 +123,7 @@ class CountryCodePicker extends StatefulWidget {
     this.closeIcon = const Icon(Icons.close),
     this.countryList = codes,
     Key? key,
+    required this.hasError,
   }) : super(key: key);
 
   @override
@@ -171,7 +175,9 @@ class CountryCodePickerState extends State<CountryCodePicker> {
           decoration: BoxDecoration(
             color: const Color(0x3FABADDF),
             border: Border.all(
-              color: const Color(0x7F282A8D),
+              color: widget.hasError
+                  ? HexColor.fromHex('#D04343')
+                  : const Color(0x7F282A8D),
               width: 1,
             ),
           ),

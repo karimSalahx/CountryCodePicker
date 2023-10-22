@@ -29,7 +29,7 @@ class MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
       ],
       home: Scaffold(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: const Text('CountryPicker Example'),
         ),
@@ -38,6 +38,7 @@ class MyAppState extends State<MyApp> {
             barrierColor: Colors.transparent,
             backgroundColor: Colors.transparent,
             dialogBackgroundColor: Colors.transparent,
+            hasError: false,
             initialSelection: countryCode,
             onChanged: print,
             showFlagDialog: false,
