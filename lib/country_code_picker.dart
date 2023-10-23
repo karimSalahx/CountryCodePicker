@@ -70,6 +70,8 @@ class CountryCodePicker extends StatefulWidget {
   /// Width of the flag images
   final double flagWidth;
 
+  final bool invert;
+
   /// Use this property to change the order of the options
   final Comparator<CountryCode>? comparator;
 
@@ -124,6 +126,7 @@ class CountryCodePicker extends StatefulWidget {
     this.countryList = codes,
     Key? key,
     required this.hasError,
+    this.invert = false,
   }) : super(key: key);
 
   @override
@@ -172,15 +175,24 @@ class CountryCodePickerState extends State<CountryCodePicker> {
       internalWidget = GestureDetector(
         onTap: widget.enabled ? showCountryCodePickerDialog : null,
         child: Container(
-          decoration: BoxDecoration(
-            color: const Color(0x3FABADDF),
-            border: Border.all(
-              color: widget.hasError
-                  ? HexColor.fromHex('#D04343')
-                  : const Color(0x7F282A8D),
-              width: 1,
-            ),
-          ),
+          decoration: widget.invert
+              ? BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: widget.hasError
+                        ? HexColor.fromHex('#D04343')
+                        : HexColor.fromHex('#434343'),
+                    width: 1,
+                  ))
+              : BoxDecoration(
+                  color: const Color(0x3FABADDF),
+                  border: Border.all(
+                    color: widget.hasError
+                        ? HexColor.fromHex('#D04343')
+                        : const Color(0x7F282A8D),
+                    width: 1,
+                  ),
+                ),
           child: Padding(
             padding: widget.padding,
             child: Flex(
