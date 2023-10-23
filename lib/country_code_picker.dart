@@ -89,7 +89,7 @@ class CountryCodePicker extends StatefulWidget {
   final List<Map<String, String>> countryList;
 
   final bool hasError;
-
+final double borderRadius;
   const CountryCodePicker({
     this.onChanged,
     this.onInit,
@@ -126,7 +126,7 @@ class CountryCodePicker extends StatefulWidget {
     this.countryList = codes,
     Key? key,
     required this.hasError,
-    this.invert = false,
+    this.invert = false,  this.borderRadius=0,
   }) : super(key: key);
 
   @override
@@ -178,7 +178,7 @@ class CountryCodePickerState extends State<CountryCodePicker> {
           decoration: widget.invert
               ? BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
                   border: Border.all(
                     color: widget.hasError
                         ? HexColor.fromHex('#D04343')
