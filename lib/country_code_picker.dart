@@ -178,7 +178,7 @@ class CountryCodePickerState extends State<CountryCodePicker> {
           decoration: widget.invert
               ? BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(3),
                   border: Border.all(
                     color: widget.hasError
                         ? HexColor.fromHex('#D04343')
