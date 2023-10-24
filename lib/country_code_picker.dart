@@ -89,7 +89,7 @@ class CountryCodePicker extends StatefulWidget {
   final List<Map<String, String>> countryList;
 
   final bool hasError;
-final double borderRadius;
+  final double borderRadius;
   const CountryCodePicker({
     this.onChanged,
     this.onInit,
@@ -126,7 +126,8 @@ final double borderRadius;
     this.countryList = codes,
     Key? key,
     required this.hasError,
-    this.invert = false,  this.borderRadius=0,
+    this.invert = false,
+    this.borderRadius = 0,
   }) : super(key: key);
 
   @override
@@ -175,6 +176,7 @@ class CountryCodePickerState extends State<CountryCodePicker> {
       internalWidget = GestureDetector(
         onTap: widget.enabled ? showCountryCodePickerDialog : null,
         child: Container(
+          padding: const EdgeInsets.only(top: 5),
           decoration: widget.invert
               ? BoxDecoration(
                   color: Colors.white,
