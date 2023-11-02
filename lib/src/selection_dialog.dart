@@ -59,83 +59,92 @@ class _SelectionDialogState extends State<SelectionDialog> {
   Widget build(BuildContext context) => SizedBox(
         width: widget.size?.width ?? MediaQuery.of(context).size.width,
         height: widget.size?.height ?? MediaQuery.of(context).size.height * .8,
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(width: 45),
-                Container(
-                  transform: Matrix4.translationValues(0, 10, 0),
-                  child: const Text(
-                    'Select your country code',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF434343),
-                      fontSize: 18,
-                      fontFamily: 'Nunito',
-                      fontWeight: FontWeight.w500,
-                      height: 0.07,
-                      letterSpacing: 0.90,
+        child: NotificationListener<ScrollUpdateNotification>(
+          onNotification: (notification) {
+            // Check if the user is scrolling up to the top of the list
+            if (notification.metrics.pixels < 1) {
+              _alreadyEncounteredCharacters.clear();
+            }
+            return false;
+          },
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(width: 45),
+                  Container(
+                    transform: Matrix4.translationValues(0, 10, 0),
+                    child: const Text(
+                      'Select your country code',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Color(0xFF434343),
+                        fontSize: 18,
+                        fontFamily: 'Nunito',
+                        fontWeight: FontWeight.w500,
+                        height: 0.07,
+                        letterSpacing: 0.90,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 40),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  child: const RotatedBox(
-                    quarterTurns: 3,
-                    child: Icon(
-                      Icons.arrow_back_ios,
-                      size: 17,
+                  const SizedBox(width: 40),
+                  GestureDetector(
+                    onTap: () => Navigator.of(context).pop(),
+                    child: const RotatedBox(
+                      quarterTurns: 3,
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        size: 17,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 33),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredElements.length,
-                itemBuilder: (context, index) {
-                  final e = filteredElements[index];
-                  bool shouldShowCharacter = _shouldShowCharacterFun(index);
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (shouldShowCharacter) _displayLetter(characterToShow),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 40),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 8.0,
-                                horizontal: 24.0,
-                              ),
-                              child: GestureDetector(
-                                child: _buildOption(e),
-                                onTap: () => _selectItem(e),
-                              ),
-                            ),
-                            const Divider(
-                              endIndent: 40,
-                              indent: 25,
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  );
-                },
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 33),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredElements.length,
+                  itemBuilder: (context, index) {
+                    final e = filteredElements[index];
+                    bool shouldShowCharacter = _shouldShowCharacterFun(index);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (shouldShowCharacter)
+                          _displayLetter(characterToShow),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 40),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 24.0,
+                                ),
+                                child: GestureDetector(
+                                  child: _buildOption(e),
+                                  onTap: () => _selectItem(e),
+                                ),
+                              ),
+                              const Divider(
+                                endIndent: 40,
+                                indent: 25,
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       );
-
 
   bool _shouldShowCharacterFun(int index) {
     String firstCharacter = _getFirstCharacter(filteredElements[index].name!);
@@ -147,7 +156,6 @@ class _SelectionDialogState extends State<SelectionDialog> {
     }
     return false;
   }
-
 
   String _getFirstCharacter(String name) {
     return name
