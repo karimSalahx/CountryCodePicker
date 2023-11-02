@@ -51,70 +51,76 @@ class SelectionDialog extends StatefulWidget {
 }
 
 class _SelectionDialogState extends State<SelectionDialog> {
-  late List<CountryCode> filteredElements;
-  String characterToShow = '';
-  Set<String> _alreadyEncounteredCharacters = Set<String>();
+  Map<String, List<CountryCode>> sortedCountryMap = {};
+
+  @override
+  void initState() {
+    _initializeSortedCountryMap();
+    super.initState();
+  }
+
+  void _initializeSortedCountryMap() {
+    widget.elements.sort((a, b) => a.name!.compareTo(b.name!));
+
+    for (var country in widget.elements) {
+      String firstCharacter = _getFirstCharacter(country.name!);
+      sortedCountryMap[firstCharacter] ??= [];
+      sortedCountryMap[firstCharacter]!.add(country);
+    }
+  }
 
   @override
   Widget build(BuildContext context) => SizedBox(
         width: widget.size?.width ?? MediaQuery.of(context).size.width,
         height: widget.size?.height ?? MediaQuery.of(context).size.height * .8,
-        child: NotificationListener<ScrollUpdateNotification>(
-          onNotification: (notification) {
-            // Check if the user is scrolling up to the top of the list
-            if (notification.metrics.pixels < 1) {
-              _alreadyEncounteredCharacters.clear();
-            }
-            return false;
-          },
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 45),
-                  Container(
-                    transform: Matrix4.translationValues(0, 10, 0),
-                    child: const Text(
-                      'Select your country code',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF434343),
-                        fontSize: 18,
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w500,
-                        height: 0.07,
-                        letterSpacing: 0.90,
-                      ),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(width: 45),
+                Container(
+                  transform: Matrix4.translationValues(0, 10, 0),
+                  child: const Text(
+                    'Select your country code',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF434343),
+                      fontSize: 18,
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w500,
+                      height: 0.07,
+                      letterSpacing: 0.90,
                     ),
                   ),
-                  const SizedBox(width: 40),
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: const RotatedBox(
-                      quarterTurns: 3,
-                      child: Icon(
-                        Icons.arrow_back_ios,
-                        size: 17,
-                      ),
+                ),
+                const SizedBox(width: 40),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: const RotatedBox(
+                    quarterTurns: 3,
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      size: 17,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 33),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filteredElements.length,
-                  itemBuilder: (context, index) {
-                    final e = filteredElements[index];
-                    bool shouldShowCharacter = _shouldShowCharacterFun(index);
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (shouldShowCharacter)
-                          _displayLetter(characterToShow),
+                ),
+              ],
+            ),
+            const SizedBox(height: 33),
+            Expanded(
+              child: ListView.builder(
+                itemCount: sortedCountryMap.length,
+                itemBuilder: (context, index) {
+                  final character = sortedCountryMap.keys.elementAt(index);
+                  final countries = sortedCountryMap[character]!;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _displayLetter(character),
+                      for (var e in countries)
                         Padding(
                           padding: const EdgeInsets.only(left: 40),
                           child: Column(
@@ -135,27 +141,15 @@ class _SelectionDialogState extends State<SelectionDialog> {
                               ),
                             ],
                           ),
-                        )
-                      ],
-                    );
-                  },
-                ),
+                        ),
+                    ],
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
-
-  bool _shouldShowCharacterFun(int index) {
-    String firstCharacter = _getFirstCharacter(filteredElements[index].name!);
-    if (firstCharacter != characterToShow &&
-        !_alreadyEncounteredCharacters.contains(firstCharacter)) {
-      characterToShow = firstCharacter;
-      _alreadyEncounteredCharacters.add(firstCharacter);
-      return true;
-    }
-    return false;
-  }
 
   String _getFirstCharacter(String name) {
     return name
@@ -197,45 +191,9 @@ class _SelectionDialogState extends State<SelectionDialog> {
     );
   }
 
-  Widget _buildEmptySearchWidget(BuildContext context) {
-    if (widget.emptySearchBuilder != null) {
-      return widget.emptySearchBuilder!(context);
-    }
 
-    return Center(
-      child: Text(CountryLocalizations.of(context)?.translate('no_country') ??
-          'No country found'),
-    );
-  }
-
-  @override
-  void initState() {
-    filteredElements = widget.elements;
-    _sortFilteredElements(); // Sort the elements
-    super.initState();
-  }
-
-  void _filterElements(String s) {
-    s = s.toUpperCase();
-    setState(() {
-      filteredElements = widget.elements
-          .where((e) =>
-              e.code!.contains(s) ||
-              e.dialCode!.contains(s) ||
-              e.name!.toUpperCase().contains(s))
-          .toList();
-      _sortFilteredElements(); // Sort the filtered elements
-    });
-  }
 
   void _selectItem(CountryCode e) {
     Navigator.pop(context, e);
-  }
-
-  void _sortFilteredElements() {
-    filteredElements.sort((a, b) => a.name!
-        .replaceAll(RegExp(r'[[\]]'), '')
-        .toUpperCase()[0]
-        .compareTo(b.name!.replaceAll(RegExp(r'[[\]]'), '').toUpperCase()[0]));
   }
 }
