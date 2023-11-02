@@ -53,6 +53,7 @@ class SelectionDialog extends StatefulWidget {
 class _SelectionDialogState extends State<SelectionDialog> {
   late List<CountryCode> filteredElements;
   String characterToShow = '';
+  Set<String> _alreadyEncounteredCharacters = Set<String>();
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -135,14 +136,18 @@ class _SelectionDialogState extends State<SelectionDialog> {
         ),
       );
 
+
   bool _shouldShowCharacterFun(int index) {
     String firstCharacter = _getFirstCharacter(filteredElements[index].name!);
-    if (firstCharacter != characterToShow) {
+    if (firstCharacter != characterToShow &&
+        !_alreadyEncounteredCharacters.contains(firstCharacter)) {
       characterToShow = firstCharacter;
+      _alreadyEncounteredCharacters.add(firstCharacter);
       return true;
     }
     return false;
   }
+
 
   String _getFirstCharacter(String name) {
     return name
