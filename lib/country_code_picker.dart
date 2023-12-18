@@ -20,6 +20,8 @@ class CountryCodePicker extends StatefulWidget {
   final List<String> favorite;
   final TextStyle? textStyle;
   final EdgeInsetsGeometry padding;
+    final EdgeInsetsGeometry? margin;
+
   final bool showCountryOnly;
   final InputDecoration searchDecoration;
   final TextStyle? searchStyle;
@@ -96,6 +98,8 @@ class CountryCodePicker extends StatefulWidget {
     this.initialSelection,
     this.favorite = const [],
     this.textStyle,
+        this.margin,
+
     this.padding = const EdgeInsets.all(8.0),
     this.showCountryOnly = false,
     this.searchDecoration = const InputDecoration(),
@@ -176,6 +180,7 @@ class CountryCodePickerState extends State<CountryCodePicker> {
       internalWidget = GestureDetector(
         onTap: widget.enabled ? showCountryCodePickerDialog : null,
         child: Container(
+          margin: widget.margin,
           padding: const EdgeInsets.only(top: 5),
           decoration: widget.invert
               ? BoxDecoration(
