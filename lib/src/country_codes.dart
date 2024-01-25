@@ -439,11 +439,11 @@ const List<Map<String, String>> codes = [
     "code": "GT",
     "dial_code": "+502",
   },
-  {
-    "name": "Guernsey",
-    "code": "GG",
-    "dial_code": "+44",
-  },
+  // {
+  //   "name": "Guernsey",
+  //   "code": "GG",
+  //   "dial_code": "+44",
+  // },
   {
     "name": "Guinée",
     "code": "GN",
@@ -519,11 +519,11 @@ const List<Map<String, String>> codes = [
     "code": "IE",
     "dial_code": "+353",
   },
-  {
-    "name": "Isle of Man",
-    "code": "IM",
-    "dial_code": "+44",
-  },
+  // {
+  //   "name": "Isle of Man",
+  //   "code": "IM",
+  //   "dial_code": "+44",
+  // },
   {
     "name": "ישראל",
     "code": "IL",
@@ -544,11 +544,11 @@ const List<Map<String, String>> codes = [
     "code": "JP",
     "dial_code": "+81",
   },
-  {
-    "name": "Jersey",
-    "code": "JE",
-    "dial_code": "+44",
-  },
+  // {
+  //   "name": "Jersey",
+  //   "code": "JE",
+  //   "dial_code": "+44",
+  // },
   {
     "name": "الأردن",
     "code": "JO",
