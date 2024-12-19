@@ -1,9 +1,7 @@
-import 'dart:developer';
-
+import 'package:country_code_picker/src/string_extesion.dart';
 import 'package:flutter/material.dart';
 
 import 'country_code.dart';
-import 'country_localizations.dart';
 
 class SelectionDialog extends StatefulWidget {
   final List<CountryCode> elements;
@@ -180,7 +178,9 @@ class _SelectionDialogState extends State<SelectionDialog> {
     return SizedBox(
       width: 400,
       child: Text(
-        widget.showCountryOnly! ? e.toCountryStringOnly() : e.toLongString(),
+        widget.showCountryOnly!
+            ? e.toCountryStringOnly().fixUsCode()
+            : e.toLongString().fixUsCode(),
         style: const TextStyle(
           color: Color(0xFF434343),
           fontSize: 18,
@@ -190,8 +190,6 @@ class _SelectionDialogState extends State<SelectionDialog> {
       ),
     );
   }
-
-
 
   void _selectItem(CountryCode e) {
     Navigator.pop(context, e);

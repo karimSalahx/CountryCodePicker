@@ -2,6 +2,7 @@ library country_code_picker;
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:country_code_picker/src/color_extension.dart';
+import 'package:country_code_picker/src/string_extesion.dart';
 import 'package:flutter/material.dart';
 
 import 'src/country_code.dart';
@@ -230,8 +231,8 @@ class CountryCodePickerState extends State<CountryCodePicker> {
                   fit: widget.alignLeft ? FlexFit.tight : FlexFit.loose,
                   child: Text(
                     widget.showOnlyCountryWhenClosed
-                        ? selectedItem!.toCountryStringOnly()
-                        : selectedItem.toString(),
+                        ? selectedItem!.toCountryStringOnly().fixUsCode()
+                        : selectedItem.toString().fixUsCode(),
                     style: widget.textStyle ??
                         Theme.of(context).textTheme.labelLarge,
                     overflow: widget.textOverflow,
