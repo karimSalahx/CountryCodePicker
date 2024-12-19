@@ -49,22 +49,27 @@ class SelectionDialog extends StatefulWidget {
 }
 
 class _SelectionDialogState extends State<SelectionDialog> {
-  Map<String, List<CountryCode>> sortedCountryMap = {};
+  late List<CountryCode> filteredElements;
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
-    _initializeSortedCountryMap();
     super.initState();
+    filteredElements = widget.elements;
   }
 
-  void _initializeSortedCountryMap() {
-    widget.elements.sort((a, b) => a.name!.compareTo(b.name!));
-
-    for (var country in widget.elements) {
-      String firstCharacter = _getFirstCharacter(country.name!);
-      sortedCountryMap[firstCharacter] ??= [];
-      sortedCountryMap[firstCharacter]!.add(country);
-    }
+  void _filterCountries(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        filteredElements = widget.elements;
+      } else {
+        filteredElements = widget.elements
+            .where((element) =>
+                element.name!.toLowerCase().contains(query.toLowerCase()) ||
+                element.code!.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   @override
@@ -107,39 +112,32 @@ class _SelectionDialogState extends State<SelectionDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: 33),
+            const SizedBox(height: 30),
+            if (!widget.hideSearch)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextFormField(
+                  controller: searchController,
+                  decoration: widget.searchDecoration.copyWith(
+                    hintText: 'Search country or code', // Add hint text here
+                  ),
+                  style: widget.searchStyle
+                  onChanged: _filterCountries,
+                ),
+              ),
+            const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: sortedCountryMap.length,
+                itemCount: filteredElements.length,
                 itemBuilder: (context, index) {
-                  final character = sortedCountryMap.keys.elementAt(index);
-                  final countries = sortedCountryMap[character]!;
+                  final country = filteredElements[index];
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _displayLetter(character),
-                      for (var e in countries)
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 24.0,
-                                ),
-                                child: GestureDetector(
-                                  child: _buildOption(e),
-                                  onTap: () => _selectItem(e),
-                                ),
-                              ),
-                              const Divider(
-                                endIndent: 40,
-                                indent: 25,
-                              ),
-                            ],
-                          ),
-                        ),
+                      ListTile(
+                        title: _buildOption(country),
+                        onTap: () => _selectItem(country),
+                      ),
+                      const Divider(),
                     ],
                   );
                 },
@@ -149,44 +147,16 @@ class _SelectionDialogState extends State<SelectionDialog> {
         ),
       );
 
-  String _getFirstCharacter(String name) {
-    return name
-        .replaceAll(RegExp(r'[[\]]'), '')
-        .split(',')
-        .first[0]
-        .toUpperCase();
-  }
-
-  Widget _displayLetter(String letter) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 13, top: 13, left: 27),
-      child: Text(
-        letter,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Color(0xFF979797),
-          fontSize: 16,
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.w600,
-          height: 0.08,
-        ),
-      ),
-    );
-  }
-
   Widget _buildOption(CountryCode e) {
-    return SizedBox(
-      width: 400,
-      child: Text(
-        widget.showCountryOnly!
-            ? e.toCountryStringOnly().fixUsCode()
-            : e.toLongString().fixUsCode(),
-        style: const TextStyle(
-          color: Color(0xFF434343),
-          fontSize: 18,
-          fontFamily: 'Nunito',
-          fontWeight: FontWeight.w400,
-        ),
+    return Text(
+      widget.showCountryOnly!
+          ? e.toCountryStringOnly().fixUsCode()
+          : e.toLongString().fixUsCode(),
+      style: const TextStyle(
+        color: Color(0xFF434343),
+        fontSize: 18,
+        fontFamily: 'Nunito',
+        fontWeight: FontWeight.w400,
       ),
     );
   }
