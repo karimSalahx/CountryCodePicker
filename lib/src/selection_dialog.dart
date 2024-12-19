@@ -121,7 +121,7 @@ class _SelectionDialogState extends State<SelectionDialog> {
                   decoration: widget.searchDecoration.copyWith(
                     hintText: 'Search country or code', // Add hint text here
                   ),
-                  style: widget.searchStyle
+                  style: widget.searchStyle,
                   onChanged: _filterCountries,
                 ),
               ),
